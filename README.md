@@ -1,4 +1,123 @@
-c_tricks
-========
+### Use double bang(!!) to change a variable to 0 or 1
+Useful for returning true or false based on a value > 0
 
-Little C tricks that are sometimes helpful
+    main()
+    {
+        unsigned long int var = 5;
+        printf("%d %d %d\n",var, !var, !!var);
+    }
+
+
+### Use printf("%.*s",length,buf) to print a specific length from a buffer
+Not very safe but useful for debugging circular buffers and the like.
+
+    char buf[10] = "abcdefghij";
+    main()
+    {
+        printf("%.*s\n",2,buf);
+        printf("%.*s\n",4,buf);
+        printf("%.*s\n",6,buf);
+        printf("%.*s\n",8,buf);
+        printf("%.*s\n",10,buf);
+    }
+
+### Associate strings with values
+
+If you have some defined or enummed values sometimes you want to associate strings with them to help with debug
+
+    enum MyErrors
+    {
+        EINVAL,
+        ENOMEM,
+        EFAULT
+    };
+
+You can init your string array using these names to make it either to correlate them
+
+    char *err_strings[] =
+    {
+        [0]      = "Success",
+        [EINVAL] = "Invalid argument",
+        [ENOMEM] = "Not enough memory",
+        [EFAULT] = "Bad address"
+    };
+
+Now you can printf("%s",err_string[err]) and easily see what's going on
+
+Sometimes all you want to do is spit the string itself out for debug
+
+    enum Events
+    {
+        IDLE,
+        ENTER,
+        EXIT,
+        TIMER_TICK
+    };
+
+With a little preprocessor help we can make the initialization of these strings a lot easier
+
+    const char* event_string[] =
+    {
+    #define EVENT_NAME(s) [s] = #s
+        EVENT_NAME(IDLE),
+        EVENT_NAME(ENTER),
+        EVENT_NAME(EXIT),
+        EVENT_NAME(TIMER_TICK)
+    };
+
+### Call a list of functions
+
+    #include <stdarg.h>
+    
+    void CallThese(int count, ...)
+    {
+        va_list arg_list;
+        int i;
+        va_start(arg_list, count);
+        for (i = 0; i < count; i++)
+        {
+            void (*fn)() = va_arg(arg_list, void (*)());
+            (*fn)();
+        }
+        va_end(arg_list);
+    }
+    
+    void func1()
+    {
+        printf("one\n");
+    }
+    void func2()
+    {
+        printf("two\n");
+    }
+    void func3()
+    {
+        printf("three\n");
+    }
+    
+    void main()
+    {
+        CallThese(4,func1,func2,func3,func1);
+    }
+
+### Define case statements in a switch to reduce code redundancy
+This is really useful on embedded systems where you may have multiple copies of a specific hardware block with the same initialization but different register names.
+
+    void SpecificHardwareInit(uint8_t channel)
+    {
+    #define REG_INIT_CASE(x)    \
+        case x:                 \
+            REG_##x##_A = 0;    \
+            REG_##x##_B = 0x55; \
+            REG_##x##_C = 0x02; \
+            break;
+
+        switch(channel)
+        {
+            REG_INIT_CASE(0);
+            REG_INIT_CASE(1);
+            REG_INIT_CASE(2);
+            REG_INIT_CASE(3);
+        }
+    }
+
