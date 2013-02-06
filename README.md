@@ -122,7 +122,7 @@ This is really useful on embedded systems where you may have multiple copies of 
     }
 
 ### Glue register names together to create optimized hardware init code
-If you're working on a very space-limited device but still want clear hardware init code you can abuse the preprocessor and use it to glue together statements that compiler to single statements.
+If you're working on a very space-limited device but still want clear hardware init code you can abuse the preprocessor and use it to glue together statements that compile to single statements.
     
     #define _PORT(n)     n##_PORT
     #define _PIN(n)      n##_PIN
