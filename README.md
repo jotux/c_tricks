@@ -119,6 +119,7 @@ This is really useful on embedded systems where you may have multiple copies of 
             REG_INIT_CASE(2);
             REG_INIT_CASE(3);
         }
+    #undef REG_INIT_CASE
     }
 
 ### Glue register names together to create optimized hardware init code
