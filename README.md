@@ -125,25 +125,21 @@ This is really useful on embedded systems where you may have multiple copies of 
 ### Glue register names together to create optimized hardware init code
 If you're working on a very space-limited device but still want clear hardware init code you can abuse the preprocessor and use it to glue together statements that compile to single statements.
     
-    #define _PORT(n)     n##_PORT
-    #define _PIN(n)      n##_PIN
-    #define _REG(n,type) P##n##type
     #define _BV(x)       (1<<(x))
 
     #define CLEAR_OP    &=~
     #define SET_OP      |=
     #define TOGGLE_OP   ^=
 
-    #define GPIO_INPUT  CLEAR_OP
-    #define GPIO_OUTPUT SET_OP
+    #define _INPUT  CLEAR_OP
+    #define _OUTPUT SET_OP
 
-    #define IO_DIRECTION(name,fun)          _IO_DIRECTION(_PORT(name),_PIN(name),fun)
-    #define _IO_DIRECTION(port,pin,fun)     _REG(port,DIR) fun _BV(pin)
+    #define HW_DIRECTION(n,op)    HW_DIRECTION_(n,op)
+    #define HW_DIRECTION_(p,i,op) P##p##DIR op _BV(i)
 
-    #define LED_PORT 1
-    #define LED_PIN 3
+    #define LED 1,3
 
-    IO_DIRECTION(LED,GPIO_INPUT); // This line will be converted to P1DIR &=~(1<<(3));
+    HW_DIRECTION(LED,GPIO_INPUT); // This line will be converted to P1DIR &=~(1<<(3));
 
 
 
