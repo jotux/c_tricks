@@ -69,35 +69,26 @@ With a little preprocessor help we can make the initialization of these strings 
 
     #include <stdarg.h>
     
-    void CallThese(int count, ...)
+    void CallThese(void (*first)(void), ...)
     {
         va_list arg_list;
-        int i;
-        va_start(arg_list, count);
-        for (i = 0; i < count; i++)
+        void (*fn)() = NULL;
+        va_start(arg_list, first);
+        (*first)();
+        while ((fn = va_arg(arg_list, int*)) != NULL)
         {
-            void (*fn)() = va_arg(arg_list, void (*)());
             (*fn)();
         }
         va_end(arg_list);
     }
     
-    void func1()
-    {
-        printf("one\n");
-    }
-    void func2()
-    {
-        printf("two\n");
-    }
-    void func3()
-    {
-        printf("three\n");
-    }
+    void f1(){printf("one\n");}
+    void f2(){printf("two\n");}
+    void f3(){printf("three\n");}
     
     void main()
     {
-        CallThese(4,func1,func2,func3,func1);
+        CallThese(f1,f2,f3,f1,f2,f3,f1);
     }
 
 ### Define case statements in a switch to reduce code redundancy
