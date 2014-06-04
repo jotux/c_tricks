@@ -75,7 +75,7 @@ With a little preprocessor help we can make the initialization of these strings 
         void (*fn)() = NULL;
         va_start(arg_list, first);
         (*first)();
-        while ((fn = va_arg(arg_list, int*)) != NULL)
+        while ((fn = va_arg(arg_list, void*)) != NULL)
         {
             (*fn)();
         }
